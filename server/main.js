@@ -2,6 +2,16 @@ const { app, BrowserWindow, ipcMain, dialog, nativeImage } = require('electron')
 const path = require('path')
 const config = require('./config.js');
 
+// Rechargement automatique en développement
+try {
+  require('electron-reload')(path.join(__dirname, '../'), {
+    electron: path.join(__dirname, '../node_modules', '.bin', 'electron'),
+    hardResetMethod: 'exit'
+  });
+} catch (err) {
+  console.log('electron-reload not available');
+}
+
 app.commandLine.appendSwitch('--no-sandbox'); // without this, the app crashes when launched from a network drive
 
 function createWindow () {

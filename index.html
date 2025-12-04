@@ -5,8 +5,64 @@
     <title>Brownovo client</title>
   </head>
   <body>
-    <h1>Bienvenue sur Brownovo client</h1>
-    <button id="start-btn">Choisir un fichier</button>
+    <h1>Brownovo</h1>
+    <!-- <button id="mgf-loader" class="loader-btn">Select MGF file(s)</button> -->
+    <label for="mgf-loader">Select MGF file(s)</label>
+    <input type="file" id="mgf-loader" accept=".mgf" multiple>
+    
+    
+    <div>
+      <h2>Recover</h2>
+      <div class="recover-params">
+        <select id="mgf-select" multiple></select>
+        <label for="emergence">Emergence:</label>
+        <input type="number" id="emergence" value="3" min="1" step="1">
+
+        <label for="min-upn">Minimum UPN:</label>
+        <input type="number" id="min-upn" value="3" min="1" step="1">
+
+        <label>Minimum Intensity method:</label>
+        <label><input type="radio" name="intensity-method" value="average" checked> Average</label>
+        <label><input type="radio" name="intensity-method" value="median"> Median</label>        
+        <button id="recover-btn">Recover</button>
+      </div>
+      
+      <h2>De Novo</h2>
+      <div class="denovo-params">
+        <select id="denovo-mgf-select" multiple></select>
+        <label><input type="radio" name="denovo-method" value="novor"> Novor</label>
+        <label><input type="radio" name="denovo-method" value="powernovo" checked> Powernovo</label>
+        
+        <label for="min-global-score">Minimum global score:</label>
+        <input type="number" id="min-global-score" value="25" min="0" step="1">
+        
+        <label for="min-residue-score">Minimum residue score:</label>
+        <input type="number" id="min-residue-score" value="50" min="0" step="1">
+        
+        <label for="min-peptide-length">Minimum peptide length:</label>
+        <input type="number" id="min-peptide-length" value="6" min="1" step="1">
+        
+        <button id="denovo-btn">De novo prediction</button>
+      </div>
+
+      <h2>MS-Blast (Database comparison)</h2>
+      <div class="msblast-params">
+        <label for="db-fasta">Select a database file:</label>
+        <input type="file" id="db-fasta" accept=".fasta,.faa,.fa">
+
+        <label for="denovo-fasta-input">Load de novo output fasta file(s):</label>
+        <input type="file" id="denovo-fasta-input" accept=".fasta,.faa,.fa" multiple>
+
+        <label for="denovo-fasta-select">Select a De novo file:</label>
+        <select id="denovo-fasta-select" multiple></select>
+
+        <button id="msblast-btn">MS-Blast</button>
+
+
+      </div>
+
+    </div>
+
     <script src="client/app.js"></script>
   </body>
 </html>
