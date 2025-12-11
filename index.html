@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+    <link rel="stylesheet" href="css/styles.css">
+    <title>Brownovo client</title>
+  </head>
+  <body>
+    <div class="container">
+      <main class="main-content">
+        <div class="title-container">
+          <img src="img/logo.png" alt="Brownovo" class="title-icon">
+          <h1>Brownovo</h1>
+        </div>
+        
+        <div class="tab-container">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="recover">Recover</button>
+            <button class="tab-btn" data-tab="denovo">De Novo</button>
+            <button class="tab-btn" data-tab="msblast">MS-Blast</button>
+          </div>
+
+          <div class="tab-content">
+            <div id="recover-tab" class="tab-panel active">
+              <div class="recover-params">
+                <label for="mgf-select">Select MGF files:</label>
+                <select id="mgf-select" multiple style="display: none;"></select>
+                <p class="helper-text" id="mgf-select-helper" style="display: none;">Please load MGF files first</p>
+                
+                <label for="emergence">Emergence:</label>
+                <input type="number" id="emergence" value="3" min="1" step="1">
+
+                <label for="min-upn">Minimum UPN:</label>
+                <input type="number" id="min-upn" value="3" min="1" step="1">
+
+                <label>Minimum Intensity method:</label>
+                <label><input type="radio" name="intensity-method" value="average" checked> Average</label>
+                <label><input type="radio" name="intensity-method" value="median"> Median</label>        
+                <button id="recover-btn">Recover</button>
+              </div>
+            </div>
+
+            <div id="denovo-tab" class="tab-panel">
+              <div class="denovo-params">
+                <label for="denovo-mgf-select">Select MGF files:</label>
+                <select id="denovo-mgf-select" multiple style="display: none;"></select>
+                <p class="helper-text" id="denovo-mgf-select-helper" style="display: none;">Please load MGF files first</p>
+                
+                <label><input type="radio" name="denovo-method" value="novor"> Novor</label>
+                <label><input type="radio" name="denovo-method" value="powernovo" checked> Powernovo</label>
+                
+                <label for="min-global-score">Minimum global score:</label>
+                <input type="number" id="min-global-score" value="25" min="0" step="1">
+                
+                <label for="min-residue-score">Minimum residue score:</label>
+                <input type="number" id="min-residue-score" value="50" min="0" step="1">
+                
+                <label for="min-peptide-length">Minimum peptide length:</label>
+                <input type="number" id="min-peptide-length" value="6" min="1" step="1">
+                
+                <button id="denovo-btn">De novo prediction</button>
+              </div>
+            </div>
+
+            <div id="msblast-tab" class="tab-panel">
+              <div class="msblast-params">
+                <label for="db-fasta-select">Select a database file:</label>
+                <select id="db-fasta-select" style="display: none;"></select>
+                <p class="helper-text" id="db-fasta-select-helper" style="display: none;">Please load FASTA files first</p>
+
+                <label for="denovo-fasta-select">Select De novo FASTA files:</label>
+                <select id="denovo-fasta-select" multiple style="display: none;"></select>
+                <p class="helper-text" id="denovo-fasta-select-helper" style="display: none;">Please load De novo FASTA files first (novor.fasta or powernovo.fasta)</p>
+
+                <button id="msblast-btn">MS-Blast</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <aside class="file-panel">
+        <h2>Files</h2>
+        
+        <div class="file-loader-section">
+          <button id="file-loader" type="button">Load files</button>
+        </div>
+
+        <div class="loaded-files">
+          <h3>MGF Files</h3>
+          <ul id="mgf-list"></ul>
+          
+          <h3>FASTA Files</h3>
+          <ul id="fasta-list"></ul>
+        </div>
+
+        <div class="jobs-section">
+          <h2>Jobs</h2>
+          <ul id="jobs-list">
+            <p class="empty-jobs-message">No active jobs</p>
+          </ul>
+        </div>
+      </aside>
+    </div>
+
+    <script src="client/jobManager.js"></script>
+    <script src="client/fileDisplay.js"></script>
+    <script src="client/recover.js"></script>
+    <script src="client/denovo.js"></script>
+    <script src="client/msblast.js"></script>
+    <script type='module' src="client/renderer.js"></script>
+  </body>
+</html>

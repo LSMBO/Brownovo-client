@@ -1,0 +1,14 @@
+# Personal configuration - Copy this file to application.conf and customize it
+
+# File paths
+fasta.path = "C:\\path\\to\\your\\fasta\\files"
+raw.file.path = "C:\\path\\to\\your\\raw\\files"
+
+# Server URL - Replace with your server IP and port
+server.url = http://YOUR_SERVER_IP:PORT
+
+# Job timeouts (in seconds)
+job.timeout.upload = 3600       # 1 hour
+job.timeout.recover = 3600      # 1 hour
+job.timeout.denovo = 604800     # 1 week
+job.timeout.msblast = 28800     # 8 hours

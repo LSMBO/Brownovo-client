@@ -1,0 +1,377 @@
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #e8f5e9 0%, #a5d6a7 100%);
+  color: #1b5e20;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+}
+
+.container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.file-panel {
+  width: 280px;
+  background: #fff;
+  border-left: 3px solid #4caf50;
+  padding: 20px;
+  box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+  overflow-y: auto;
+}
+
+.file-panel h2 {
+  color: #2e7d32;
+  font-size: 1.5em;
+  margin: 0 0 20px 0;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #4caf50;
+  font-weight: 400;
+}
+
+.file-panel h3 {
+  color: #388e3c;
+  font-size: 1em;
+  margin: 20px 0 10px 0;
+  font-weight: 500;
+}
+
+.file-loader-section {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.loaded-files {
+  margin-top: 20px;
+}
+
+.loaded-files ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+
+.loaded-files li {
+  padding: 8px 10px;
+  margin: 5px 0;
+  background: #f1f8e9;
+  border-left: 3px solid #66bb6a;
+  border-radius: 4px;
+  font-size: 0.9em;
+  color: #2e7d32;
+  word-break: break-all;
+}
+
+.main-content {
+  flex: 1;
+  padding: 30px;
+  overflow-y: auto;
+}
+
+h1 {
+  color: #168e1e;
+  text-align: center;
+  font-size: 2.5em;
+  margin: auto 0;
+  font-weight: 300;
+  letter-spacing: 1px;
+}
+
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 30px;
+}
+
+.title-icon {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+}
+
+h2 {
+  color: #2e7d32;
+  font-size: 1.4em;
+  margin: 30px 0 15px 0;
+  font-weight: 400;
+  padding-bottom: 8px;
+}
+
+/* Tabs styling */
+.tab-container {
+  margin-top: 20px;
+}
+
+.tabs {
+  display: flex;
+  width: 100%;
+  gap: 0;
+  border-bottom: 3px solid #4caf50;
+  margin-bottom: 0;
+}
+
+.tab-btn {
+  background: #e8f5e9;
+  color: #2e7d32;
+  border: none;
+  border-radius: 8px 8px 0 0;
+  padding: 15px 30px;
+  font-size: 1.1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 0;
+  width: 100%;
+  flex: 1 1 0;
+  position: relative;
+  bottom: -3px;
+}
+
+.tab-btn:hover {
+  background: #94c888;
+  transform: translateY(0);
+  box-shadow: none;
+}
+
+.tab-btn.active {
+  background: #fff;
+  color: #1b5e20;
+  font-weight: 600;
+}
+
+.tab-content {
+  background: #fff;
+  border-radius: 0 10px 10px 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+.tab-panel {
+  display: none;
+  padding: 0;
+  animation: fadeIn 0.3s ease-in;
+}
+
+.tab-panel.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.helper-text {
+  color: #2e7d32;
+  font-size: 0.9em;
+  font-style: italic;
+  margin: 0 0 15px 0;
+  padding: 8px 12px;
+  background: #e8f5e9;
+  border-left: 3px solid #4caf50;
+  border-radius: 4px;
+}
+
+label {
+  display: block;
+  margin: 12px 0 5px 0;
+  color: #2e7d32;
+  font-weight: 500;
+  font-size: 0.95em;
+}
+
+.file-panel label {
+  font-size: 0.9em;
+  margin: 8px 0 5px 0;
+}
+
+input[type="file"],
+input[type="number"],
+select {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0 15px 0;
+  border: 1px solid #a5d6a7;
+  border-radius: 6px;
+  font-size: 1em;
+  background: #fff;
+  transition: border-color 0.3s, box-shadow 0.3s;
+  box-sizing: border-box;
+}
+
+.file-panel input[type="file"] {
+  font-size: 0.85em;
+  padding: 8px;
+}
+
+input[type="file"]:focus,
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: #4caf50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+input[type="radio"] {
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+label:has(input[type="radio"]) {
+  display: inline-block;
+  margin-right: 20px;
+  cursor: pointer;
+  font-weight: 400;
+}
+
+button {
+  background: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 30px;
+  font-size: 1em;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-top: 15px;
+  width: 100%;
+}
+
+button:hover {
+  background: #388e3c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.recover-params,
+.denovo-params,
+.msblast-params {
+  background: #fff;
+  padding: 25px;
+  margin: 15px 0;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+}
+
+select[multiple] {
+  min-height: 120px;
+  padding: 8px;
+}
+
+.workflows {
+  max-width: 900px;
+  margin: 0 auto;
+}
+/* Jobs Section */
+.jobs-section {
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e0e0e0;
+}
+
+.jobs-section h2 {
+  color: #2e7d32;
+  font-size: 1.3em;
+  margin: 0 0 15px 0;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #4caf50;
+  font-weight: 400;
+}
+
+#jobs-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.empty-jobs-message {
+  color: #888;
+  font-style: italic;
+  font-size: 0.9em;
+  padding: 10px 0;
+}
+
+.job-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px;
+  margin-bottom: 8px;
+  background: #f5f5f5;
+  border-radius: 6px;
+  border-left: 4px solid #ccc;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+}
+
+.job-item:hover {
+  background: #eeeeee;
+}
+
+.job-running {
+  border-left-color: #2196f3;
+  background: #e3f2fd;
+}
+
+.job-completed {
+  border-left-color: #4caf50;
+  background: #e8f5e9;
+}
+
+.job-failed {
+  border-left-color: #f44336;
+  background: #ffebee;
+}
+
+.job-status {
+  font-size: 1.1em;
+  min-width: 20px;
+}
+
+.job-description {
+  flex: 1;
+  font-weight: 500;
+  color: #333;
+}
+
+.job-duration {
+  font-size: 0.85em;
+  color: #666;
+  min-width: 35px;
+  text-align: right;
+}
+
+.job-remove-btn {
+  background: transparent;
+  border: none;
+  color: #999;
+  font-size: 1.3em;
+  cursor: pointer;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  line-height: 1;
+  transition: color 0.2s ease;
+}
+
+.job-remove-btn:hover {
+  color: #f44336;
+  background: transparent;
+  transform: none;
+  box-shadow: none;
+}
