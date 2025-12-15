@@ -29,7 +29,6 @@ async function handleMsblast(fastaFiles, denovoFastaSelect, dbFastaSelect) {
       const uploadResults = await window.electronAPI.sendFiles(
         filePaths,
         'brownovo/data',
-        {}
       );
       
       const failed = uploadResults.filter(r => !r.success);

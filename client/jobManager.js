@@ -24,26 +24,20 @@ function addJob(id, type, description) {
   return job;
 }
 
-/**
- * Update an existing job
- * @param {string} id - Job ID
- * @param {string} status - New status (running, completed, failed)
- * @param {string} message - Optional message
- */
 function updateJob(id, status, message = '') {
   const job = currentJobs.find(j => j.id === id);
   if (job) {
     job.status = status;
     job.message = message;
     job.endTime = Date.now();
+    
+    // Update isJobRunning flag based on remaining running jobs
+    isJobRunning = currentJobs.some(j => j.status === 'running');
+    
     updateJobsList();
   }
 }
 
-/**
- * Remove a job from the list
- * @param {string} id - Job ID
- */
 function removeJob(id) {
   currentJobs = currentJobs.filter(j => j.id !== id);
   
@@ -53,17 +47,10 @@ function removeJob(id) {
   updateJobsList();
 }
 
-/**
- * Check if a job is running
- * @returns {boolean}
- */
 function hasRunningJob() {
   return isJobRunning;
 }
 
-/**
- * Show a warning if a job is running
- */
 function warnIfJobRunning() {
   if (hasRunningJob()) {
     alert('⚠️ A job is already running. Please wait for it to complete before starting a new one.');
@@ -72,9 +59,6 @@ function warnIfJobRunning() {
   return false;
 }
 
-/**
- * Update the job list display
- */
 function updateJobsList() {
   const jobsList = document.getElementById('jobs-list');
   if (!jobsList) return;

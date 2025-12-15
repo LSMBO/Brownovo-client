@@ -30,7 +30,6 @@ async function handleDenovo(mgfFiles, denovoMgfSelect) {
       const uploadResults = await window.electronAPI.sendFiles(
         filePaths,
         'brownovo/data',
-        {}
       );
       
       const failed = uploadResults.filter(r => !r.success);

@@ -2,7 +2,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
   // Upload files to server
-  sendFiles: (files, destinationPath, params) => ipcRenderer.invoke('send-files', files, destinationPath, params),
+  sendFiles: (files, destinationPath) => ipcRenderer.invoke('send-files', files, destinationPath),
   
   // Processing actions
   recover: (mgfFiles, params) => ipcRenderer.invoke('recover', mgfFiles, params),

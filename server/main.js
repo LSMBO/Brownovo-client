@@ -3,6 +3,7 @@ const path = require('path');
 const config = require('./config.js');
 const fs = require('fs');
 const FormData = require('form-data');
+const { CLIENT_RENEG_WINDOW } = require('tls');
 const fetch = (...args) => import('node-fetch').then(({default: fetch}) => fetch(...args));
 
 // Automatic reload in development mode
@@ -82,7 +83,7 @@ async function getJobTimeouts() {
 
 const SERVER_URL = config.get('server.url');
 
-async function sendFiles(_, filePaths, destinationPath, params) {
+async function sendFiles(_, filePaths, destinationPath) {
   const results = [];
   
   for (const filePath of filePaths) {
@@ -135,6 +136,7 @@ async function sendFiles(_, filePaths, destinationPath, params) {
 
 async function recover(_, mgfFiles, params) {
   try {
+    console.log("Starting Recover with params:", params)
     const response = await fetch(`${SERVER_URL}/recover_start`, {
       method: 'POST',
       headers: {
