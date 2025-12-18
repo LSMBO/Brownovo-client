@@ -40,7 +40,6 @@ async function handleRecover(mgfFiles, mgfSelect) {
       updateJob(`${jobId}_upload`, 'completed', `${localFiles.length} file(s) uploaded`);
       setTimeout(() => removeJob(`${jobId}_upload`), timeouts.upload);
       
-      // Add uploaded paths to server files
       const uploadedPaths = uploadResults.map(r => r.filePath);
       serverFiles.push(...uploadedPaths);
     }

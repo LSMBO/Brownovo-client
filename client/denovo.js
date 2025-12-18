@@ -1,5 +1,3 @@
-// De Novo workflow handler
-
 async function handleDenovo(mgfFiles, denovoMgfSelect) {
   const selectedIndices = Array.from(denovoMgfSelect.selectedOptions).map(opt => parseInt(opt.value));
   const selectedFiles = selectedIndices.map(idx => mgfFiles[idx]);

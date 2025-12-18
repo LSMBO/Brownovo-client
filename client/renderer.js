@@ -126,6 +126,12 @@ async function updateFastaSelects() {
   // Database select (single selection)
   dbFastaSelect.innerHTML = '';
   
+  // Add empty default option
+  const emptyOption = document.createElement('option');
+  emptyOption.value = '';
+  emptyOption.textContent = '-- Select a database --';
+  dbFastaSelect.appendChild(emptyOption);
+  
   for (const [index, file] of fastaFiles.entries()) {
     const option = document.createElement('option');
     option.value = index;
@@ -214,7 +220,6 @@ document.getElementById('recover-btn').addEventListener('click', async () => {
   // Add generated files to mgfFiles
   if (outputFiles && outputFiles.length > 0) {
     outputFiles.forEach(fileInfo => {
-      // Handle case where fileInfo is a string (path) or object {path, size}
       const filePath = typeof fileInfo === 'string' ? fileInfo : fileInfo.path;
       const fileSize = typeof fileInfo === 'object' ? fileInfo.size : undefined;
       
@@ -262,7 +267,8 @@ document.getElementById('msblast-btn').addEventListener('click', async () => {
   // Check if a job is already running
   if (warnIfJobRunning()) return;
   
-  await handleMsblast(fastaFiles, denovoFastaSelect, dbFastaSelect);
+  const outputFiles = await handleMsblast(fastaFiles, denovoFastaSelect, dbFastaSelect);
+
 });
 
 // Initialization

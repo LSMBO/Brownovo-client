@@ -16,15 +16,23 @@ async function handleMsblast(fastaFiles, denovoFastaSelect, dbFastaSelect) {
   const timeouts = await window.electronAPI.getJobTimeouts();
   
   try {
-    const allFiles = [...selectedDenovoFiles, dbFile];
-    const localFiles = allFiles.filter(f => !f.isServerFile);
-    const serverFiles = allFiles.filter(f => f.isServerFile).map(f => f.path);
+    const localDenovoFiles = selectedDenovoFiles.filter(f => !f.isServerFile);
+    const serverDenovoFiles = selectedDenovoFiles.filter(f => f.isServerFile).map(f => f.path);
+    
+    const localDbFile = dbFile.isServerFile ? null : dbFile;
+    const serverDbFile = dbFile.isServerFile ? dbFile.path : null;
 
     // Upload local files if necessary
-    if (localFiles.length > 0) {
-      addJob(`${jobId}_upload`, 'upload', `Uploading ${localFiles.length} file(s)`);
+    const allLocalFiles = [...localDenovoFiles];
+    if (localDbFile) allLocalFiles.push(localDbFile);
+    
+    let uploadedDenovoPaths = [];
+    let uploadedDbPath = null;
+    
+    if (allLocalFiles.length > 0) {
+      addJob(`${jobId}_upload`, 'upload', `Uploading ${allLocalFiles.length} file(s)`);
       
-      const filePaths = localFiles.map(f => f.path);
+      const filePaths = allLocalFiles.map(f => f.path);
       
       const uploadResults = await window.electronAPI.sendFiles(
         filePaths,
@@ -39,20 +47,27 @@ async function handleMsblast(fastaFiles, denovoFastaSelect, dbFastaSelect) {
         return null;
       }
       
-      updateJob(`${jobId}_upload`, 'completed', `${localFiles.length} file(s) uploaded`);
+      updateJob(`${jobId}_upload`, 'completed', `${allLocalFiles.length} file(s) uploaded`);
       setTimeout(() => removeJob(`${jobId}_upload`), timeouts.upload);
       
       const uploadedPaths = uploadResults.map(r => r.filePath);
-      serverFiles.push(...uploadedPaths);
+      
+      // Les premiers sont les fichiers de novo, le dernier est la db (si présente)
+      uploadedDenovoPaths = uploadedPaths.slice(0, localDenovoFiles.length);
+      if (localDbFile) {
+        uploadedDbPath = uploadedPaths[uploadedPaths.length - 1];
+      }
     }
     
-    const dbFileInServer = serverFiles[serverFiles.length - 1];
+    // Construire les listes finales pour le serveur Flask
+    const finalDenovoFiles = [...serverDenovoFiles, ...uploadedDenovoPaths];
+    const finalDbFile = serverDbFile || uploadedDbPath;
     
     // Start MS-Blast processing
-    addJob(jobId, 'msblast', `MS-Blast on ${serverFiles.length - 1} file(s)`);
+    addJob(jobId, 'msblast', `MS-Blast on ${finalDenovoFiles.length} file(s)`);
     
-    const msblastResult = await window.electronAPI.msblast(serverFiles, {
-      database: dbFileInServer
+    const msblastResult = await window.electronAPI.msblast(finalDenovoFiles, {
+      database: finalDbFile
     });
     
     if (msblastResult.success) {

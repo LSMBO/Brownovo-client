@@ -73,7 +73,10 @@ function updateJobsList() {
     return;
   }
   
-  currentJobs.forEach(job => {
+  // Sort jobs by start time, most recent first
+  const sortedJobs = [...currentJobs].sort((a, b) => b.startTime - a.startTime);
+  
+  sortedJobs.forEach(job => {
     const li = document.createElement('li');
     li.className = `job-item job-${job.status}`;
     

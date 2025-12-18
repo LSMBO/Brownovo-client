@@ -163,6 +163,7 @@ async function recover(_, mgfFiles, params) {
 
 async function denovo(_, mgfFiles, params) {
   try {
+    console.log("Starting De Novo with params:", params)
     const response = await fetch(`${SERVER_URL}/denovo_start`, {
       method: 'POST',
       headers: {
