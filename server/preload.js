@@ -9,6 +9,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   denovo: (mgfFiles, params) => ipcRenderer.invoke('denovo', mgfFiles, params),
   msblast: (fastaFiles, params) => ipcRenderer.invoke('msblast', fastaFiles, params),
   
+  // Get statistics from JSON files
+  getRecoverStats: (jsonPath) => ipcRenderer.invoke('get-recover-stats', jsonPath),
+  getDenovoStats: (jsonPath) => ipcRenderer.invoke('get-denovo-stats', jsonPath),
+  
+  // Download file
+  downloadFile: (filePath) => ipcRenderer.invoke('download-file', filePath),
+
   // File browser
   browseServer: (type, title, defaultPath, filter, properties) => ipcRenderer.invoke('browse', type, title, defaultPath, filter, properties),
   

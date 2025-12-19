@@ -39,6 +39,11 @@
                 <label><input type="radio" name="intensity-method" value="median"> Median</label>        
                 <button id="recover-btn">Recover</button>
               </div>
+              
+              <div class="visualization-section" id="recover-visualization" style="display: none;">
+                <h3>Results</h3>
+                <div id="recover-results" class="results-container"></div>
+              </div>
             </div>
 
             <div id="denovo-tab" class="tab-panel">
@@ -61,6 +66,11 @@
                 
                 <button id="denovo-btn">De novo prediction</button>
               </div>
+              
+              <div class="visualization-section" id="denovo-visualization" style="display: none;">
+                <h3>Results</h3>
+                <div id="denovo-results" class="results-container"></div>
+              </div>
             </div>
 
             <div id="msblast-tab" class="tab-panel">
@@ -74,6 +84,11 @@
                 <p class="helper-text" id="db-fasta-select-helper" style="display: none;">Please load FASTA files first</p>
 
                 <button id="msblast-btn">MS-Blast</button>
+              </div>
+              
+              <div class="visualization-section" id="msblast-visualization" style="display: none;">
+                <h3>Results</h3>
+                <div id="msblast-results" class="results-container"></div>
               </div>
             </div>
           </div>
@@ -104,6 +119,8 @@
       </aside>
     </div>
 
+    <!-- Templates are loaded dynamically from templates/ folder -->
+    <script src="client/templateLoader.js"></script>
     <script src="client/jobManager.js"></script>
     <script src="client/fileDisplay.js"></script>
     <script src="client/recover.js"></script>

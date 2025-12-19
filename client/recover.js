@@ -57,6 +57,9 @@ async function handleRecover(mgfFiles, mgfSelect) {
       updateJob(jobId, 'completed', `${recoverResult.output_files.length} file(s) generated`);
       setTimeout(() => removeJob(jobId), timeouts.recover);
       
+      // Display results in visualization section
+      displayRecoverResults(recoverResult.output_files);
+      
       alert(`Recover completed!\nGenerated files: ${recoverResult.output_files.length}`);
       console.log('Output files:', recoverResult.output_files);
       
@@ -75,6 +78,59 @@ async function handleRecover(mgfFiles, mgfSelect) {
     alert('Error: ' + error.message);
     return null;
   }
+}
+
+function displayRecoverResults(outputFiles) {
+  const visualizationSection = document.getElementById('recover-visualization');
+  const resultsContainer = document.getElementById('recover-results');
+  const template = document.getElementById('recover-result-template');
+  
+  resultsContainer.innerHTML = '';
+  
+  outputFiles.forEach(async (fileInfo) => {
+    // Clone the template
+    const card = template.content.cloneNode(true);
+    
+    // Extract file path and construct JSON path
+    const mgfPath = fileInfo.path;
+    const jsonPath = mgfPath.replace(/\.mgf$/, '.json');
+    const fileName = mgfPath.split('/').pop();
+    
+    // Extract base name (remove _recovered.mgf suffix)
+    const fileBaseName = fileName.replace(/_recovered\.mgf$/, '');
+    
+    // Set base filename immediately
+    card.querySelector('[data-field="fileBaseName"]').textContent = fileBaseName;
+    
+    try {
+      // Fetch statistics from server
+      const statsResult = await window.electronAPI.getRecoverStats(jsonPath);
+      
+      if (statsResult.success && statsResult.statistics) {
+        const stats = statsResult.statistics;
+        const percentage = stats.retention_rate.toFixed(1);
+        
+        // Populate template fields with statistics
+        card.querySelector('[data-field="totalSpectra"]').textContent = stats.total_spectra;
+        card.querySelector('[data-field="filteredSpectra"]').textContent = stats.filtered_spectra;
+        card.querySelector('[data-field="percentage"]').textContent = `${percentage}%`;
+      } else {
+        // Show error in card
+        card.querySelector('[data-field="totalSpectra"]').textContent = 'N/A';
+        card.querySelector('[data-field="filteredSpectra"]').textContent = 'N/A';
+        card.querySelector('[data-field="percentage"]').textContent = 'Error loading stats';
+      }
+    } catch (error) {
+      console.error('Error loading statistics:', error);
+      card.querySelector('[data-field="totalSpectra"]').textContent = 'N/A';
+      card.querySelector('[data-field="filteredSpectra"]').textContent = 'N/A';
+      card.querySelector('[data-field="percentage"]').textContent = 'Error';
+    }
+    
+    resultsContainer.appendChild(card);
+  });
+  
+  visualizationSection.style.display = 'block';
 }
 
 // Export pour utilisation dans renderer.js

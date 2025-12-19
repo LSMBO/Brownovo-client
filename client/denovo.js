@@ -59,6 +59,9 @@ async function handleDenovo(mgfFiles, denovoMgfSelect) {
       updateJob(jobId, 'completed', `${denovoResult.output_files.length} file(s) generated`);
       setTimeout(() => removeJob(jobId), timeouts.denovo);
       
+      // Display results in visualization section
+      displayDenovoResults(denovoResult.output_files);
+      
       alert(`De Novo completed!\nGenerated files: ${denovoResult.output_files.length}`);
       console.log('Output files:', denovoResult.output_files);
       
@@ -77,6 +80,61 @@ async function handleDenovo(mgfFiles, denovoMgfSelect) {
     alert('Error: ' + error.message);
     return null;
   }
+}
+
+function displayDenovoResults(outputFiles) {
+  const visualizationSection = document.getElementById('denovo-visualization');
+  const resultsContainer = document.getElementById('denovo-results');
+  const template = document.getElementById('denovo-result-template');
+  
+  resultsContainer.innerHTML = '';
+  
+  outputFiles.forEach(async (fileInfo) => {
+    // Clone the template
+    const card = template.content.cloneNode(true);
+    
+    // Extract file path and construct JSON path
+    const fastaPath = fileInfo.path;
+    const jsonPath = fastaPath.replace(/\.fasta$/, '.json');
+    const fileName = fastaPath.split('/').pop();
+    
+    // Extract base name (remove .fasta suffix)
+    const fileBaseName = fileName.replace(/\.fasta$/, '');
+    
+    // Set base filename immediately
+    card.querySelector('[data-field="fileBaseName"]').textContent = fileBaseName;
+    
+    try {
+      // Fetch statistics from server
+      const statsResult = await window.electronAPI.getDenovoStats(jsonPath);
+      
+      if (statsResult.success && statsResult.statistics) {
+        const stats = statsResult.statistics;
+        const percentage = stats.total_peptides > 0
+          ? ((stats.valid_peptides / stats.total_peptides) * 100).toFixed(1)
+          : '0.0';
+        
+        // Populate template fields with statistics
+        card.querySelector('[data-field="totalPeptides"]').textContent = stats.total_peptides;
+        card.querySelector('[data-field="validPeptides"]').textContent = stats.valid_peptides;
+        card.querySelector('[data-field="percentage"]').textContent = `${percentage}%`;
+      } else {
+        // Show error in card
+        card.querySelector('[data-field="totalPeptides"]').textContent = 'N/A';
+        card.querySelector('[data-field="validPeptides"]').textContent = 'N/A';
+        card.querySelector('[data-field="percentage"]').textContent = 'Error loading stats';
+      }
+    } catch (error) {
+      console.error('Error loading statistics:', error);
+      card.querySelector('[data-field="totalPeptides"]').textContent = 'N/A';
+      card.querySelector('[data-field="validPeptides"]').textContent = 'N/A';
+      card.querySelector('[data-field="percentage"]').textContent = 'Error';
+    }
+    
+    resultsContainer.appendChild(card);
+  });
+  
+  visualizationSection.style.display = 'block';
 }
 
 // Export for use in renderer.js

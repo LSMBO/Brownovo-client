@@ -74,6 +74,9 @@ async function handleMsblast(fastaFiles, denovoFastaSelect, dbFastaSelect) {
       updateJob(jobId, 'completed', `${msblastResult.output_files.length} file(s) generated`);
       setTimeout(() => removeJob(jobId), timeouts.msblast);
       
+      // Display results in visualization section
+      displayMsblastResults(msblastResult.output_files);
+      
       alert(`MS-Blast completed!\nGenerated files: ${msblastResult.output_files.length}`);
       console.log('Output files:', msblastResult.output_files);
       
@@ -92,6 +95,65 @@ async function handleMsblast(fastaFiles, denovoFastaSelect, dbFastaSelect) {
     alert('Error: ' + error.message);
     return null;
   }
+}
+
+function displayMsblastResults(outputFiles) {
+  const visualizationSection = document.getElementById('msblast-visualization');
+  const resultsContainer = document.getElementById('msblast-results');
+  const template = document.getElementById('msblast-result-template');
+  
+  resultsContainer.innerHTML = '';
+  
+  outputFiles.forEach((fileInfo) => {
+    // Clone the template
+    const card = template.content.cloneNode(true);
+    
+    // Extract TSV file info
+    const tsvFile = fileInfo.tsv_file;
+    const filePath = tsvFile.path;
+    const fileName = filePath.split('/').pop();
+    const fileSize = tsvFile.size;
+    
+    // Format file size
+    const fileSizeFormatted = formatFileSize(fileSize);
+    
+    // Populate template fields
+    card.querySelector('[data-field="fileBaseName"]').textContent = fileName;
+    card.querySelector('[data-field="fileSize"]').textContent = fileSizeFormatted;
+    
+    // Add click handler to download button
+    const downloadBtn = card.querySelector('[data-field="downloadBtn"]');
+    downloadBtn.addEventListener('click', async () => {
+      try {
+        downloadBtn.disabled = true;
+        downloadBtn.textContent = 'Downloading...';
+        
+        const result = await window.electronAPI.downloadFile(filePath);
+        
+        if (result.success) {
+          alert(`File saved to: ${result.savePath}`);
+        } else {
+          alert('Download canceled');
+        }
+      } catch (error) {
+        console.error('Download error:', error);
+        alert('Error downloading file: ' + error.message);
+      } finally {
+        downloadBtn.disabled = false;
+        downloadBtn.innerHTML = '<span class="download-icon">↓</span> Download TSV';
+      }
+    });
+    
+    resultsContainer.appendChild(card);
+  });
+  
+  visualizationSection.style.display = 'block';
+}
+
+function formatFileSize(bytes) {
+  if (bytes < 1024) return bytes + ' B';
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+  return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
 }
 
 // Export for use in renderer.js

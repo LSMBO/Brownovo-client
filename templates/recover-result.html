@@ -1,0 +1,23 @@
+<template id="recover-result-template">
+  <div class="result-card">
+    <table class="result-table">
+      <thead>
+        <tr>
+          <th>File</th>
+          <th>Before Recover</th>
+          <th>After Recover</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="file-basename" data-field="fileBaseName"></td>
+          <td class="stat-value" data-field="totalSpectra"></td>
+          <td class="after-recover-cell">
+            <span class="stat-value" data-field="filteredSpectra"></span>
+            <span class="stat-percentage" data-field="percentage"></span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</template>
