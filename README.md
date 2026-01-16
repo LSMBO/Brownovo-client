@@ -123,4 +123,4 @@ ISC
 
 ## Authors
 
-LSMBO (Laboratoire de Spectrométrie de Masse des Bio-Organiques)
+LSMBO (Laboratoire de Spectrométrie de Masse Bio-Organique)
