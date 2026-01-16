@@ -133,7 +133,7 @@ function displayRecoverResults(outputFiles) {
   visualizationSection.style.display = 'block';
 }
 
-// Export pour utilisation dans renderer.js
+// Export for use in renderer.js
 if (typeof module !== 'undefined' && module.exports) {
   module.exports = { handleRecover };
 }

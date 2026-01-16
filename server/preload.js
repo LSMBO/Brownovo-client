@@ -6,12 +6,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Processing actions
   recover: (mgfFiles, params) => ipcRenderer.invoke('recover', mgfFiles, params),
-  denovo: (mgfFiles, params) => ipcRenderer.invoke('denovo', mgfFiles, params),
+  denovoStart: (mgfFiles, params) => ipcRenderer.invoke('denovo-start', mgfFiles, params),
+  denovoTreatment: (resultFiles, params) => ipcRenderer.invoke('denovo-treatment', resultFiles, params),
   msblast: (fastaFiles, params) => ipcRenderer.invoke('msblast', fastaFiles, params),
   
   // Get statistics from JSON files
   getRecoverStats: (jsonPath) => ipcRenderer.invoke('get-recover-stats', jsonPath),
   getDenovoStats: (jsonPath) => ipcRenderer.invoke('get-denovo-stats', jsonPath),
+  
+  // Protein search and details
+  searchProtein: (proteinIndexPath, query) => ipcRenderer.invoke('search-protein', proteinIndexPath, query),
+  getProteinDetails: (proteinIndexPath, accession, filters) => ipcRenderer.invoke('get-protein-details', proteinIndexPath, accession, filters),
   
   // Download file
   downloadFile: (filePath) => ipcRenderer.invoke('download-file', filePath),

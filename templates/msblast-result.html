@@ -1,14 +1,121 @@
 <template id="msblast-result-template">
   <div class="result-card">
-    <div class="msblast-result-content">
-      <div class="msblast-file-info">
-        <span class="file-basename" data-field="fileBaseName"></span>
-        <span class="file-size" data-field="fileSize"></span>
+    <!-- Sample Selection and Download Section -->
+    <div class="msblast-header">
+      <div class="sample-selector">
+        <label for="sample-select">Select Sample:</label>
+        <select class="sample-select" data-field="sampleSelect"></select>
       </div>
       <button class="download-btn" data-field="downloadBtn">
         <span class="download-icon">↓</span>
         Download TSV
       </button>
+    </div>
+    
+    <!-- Loading Animation -->
+    <div class="loading-overlay" data-field="loadingOverlay" style="display: none;">
+      <div class="spinner"></div>
+      <p>Loading protein search...</p>
+    </div>
+    
+    <!-- Protein Search Section -->
+    <div class="protein-search-section" data-field="searchSection">
+      <h4>Protein Search</h4>
+      
+      <div class="search-form">
+        <div class="search-input-group">
+          <input type="text" 
+                 class="protein-search-input" 
+                 data-field="proteinSearchInput"
+                 placeholder="Search protein by accession...">
+          <div class="search-suggestions" data-field="searchSuggestions"></div>
+        </div>
+        
+        <div class="filter-group">
+          <div class="filter-item">
+            <label>Minimal De Novo Global Score:</label>
+            <input type="number" 
+                   class="filter-input" 
+                   data-field="filterMinScore"
+                   min="25" max="100" value="25">
+          </div>
+        </div>
+        
+        <div class="filter-group expandable-filter">
+          <div class="filter-header" data-field="filterHeader">
+            <h5>Filter peptides based on sequence similarity with the database</h5>
+            <span class="expand-icon">▼</span>
+          </div>
+          <div class="filter-content" data-field="filterContent" style="display: none;">
+            <p class="filter-explanation">
+              In an alignment, each residue is either an <strong>exact match</strong> (same amino acid) or a <strong>mismatch</strong> (different amino acid). 
+              The filters below let you decide how strict the minimum alignment length should be when <strong>all mismatches are treated the same way</strong>.
+            </p>
+            <div class="filters-grid">
+              <div class="filter-item">
+                <label>Minimum length (exact matches only):</label>
+                <input type="number" 
+                       class="filter-input" 
+                       data-field="filterExcludingPos"
+                       min="1" max="10" value="1">
+                <small class="filter-hint">Counts only exact matches toward the required alignment length. Use this to keep only perfectly matching regions.</small>
+              </div>
+              <div class="filter-item">
+                <label>Minimum length (allowing one mismatch):</label>
+                <input type="number" 
+                       class="filter-input" 
+                       data-field="filterOnePosOrMinus"
+                       min="1" max="10" value="7">
+                <small class="filter-hint">Counts exact matches and allows up to one mismatch within the required length. This is useful when you want mostly perfect alignments but still tolerate a single difference.</small>
+              </div>
+            </div>
+            
+            <p class="filter-explanation" style="margin-top: 20px;">
+              Among the mismatches, some residues may have similar biochemical properties. These are called <strong>positive mismatches</strong>. 
+              The filters below behave exactly like the previous ones, except that <strong>positive mismatches are treated as if they were exact matches</strong>.
+            </p>
+            <div class="filters-grid">
+              <div class="filter-item">
+                <label>Minimum length (including similar residues):</label>
+                <input type="number" 
+                       class="filter-input" 
+                       data-field="filterIncludingPos"
+                       min="1" max="10" value="1">
+                <small class="filter-hint">Positive mismatches are counted as exact matches. Only true mismatches reduce the match quality.</small>
+              </div>
+              <div class="filter-item">
+                <label>Minimum length (allowing one non-similar mismatch):</label>
+                <input type="number" 
+                       class="filter-input" 
+                       data-field="filterOneMinus"
+                       min="1" max="10" value="1">
+                <small class="filter-hint">Positive mismatches are accepted freely, but only one <strong>non-similar</strong> mismatch is allowed within the required length.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <button class="search-protein-btn" data-field="searchProteinBtn">
+          Search Protein
+        </button>
+      </div>
+      
+      <!-- Protein Display Section -->
+      <div class="protein-display" data-field="proteinDisplay" style="display: none;">
+        <div class="protein-header">
+          <h4 class="protein-accession" data-field="proteinAccession"></h4>
+          <p class="protein-description" data-field="proteinDescription"></p>
+          <p class="protein-info">
+            <span>Length: <strong data-field="proteinLength"></strong> aa</span>
+            <span>Coverage: <strong data-field="proteinCoverage"></strong>%</span>
+            <span>Peptides: <strong data-field="proteinPeptideCount"></strong></span>
+          </p>
+        </div>
+        
+        <div class="sequence-viewer">
+          <div class="sequence-container" data-field="sequenceContainer"></div>
+        </div>
+      </div>
     </div>
   </div>
 </template>

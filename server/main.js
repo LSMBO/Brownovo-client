@@ -96,7 +96,7 @@ async function sendFiles(_, filePaths, destinationPath) {
       // Build full destination path
       const fullDestPath = `${destinationPath}/${fileName}`;
       
-      console.log(`Sending ${fileName} (${fileSize} bytes) to ${fullDestPath}...`);
+      console.log(`Sending ${fileName} (${fileSize} bytes) to ${fullDestPath} on ${SERVER_URL}...`);
       
       const response = await fetch(`${SERVER_URL}/upload`, {
         method: 'POST',
@@ -187,7 +187,9 @@ async function getRecoverStats(_, jsonPath) {
 async function denovo(_, mgfFiles, params) {
   try {
     console.log("Starting De Novo with params:", params)
-    const response = await fetch(`${SERVER_URL}/denovo_start`, {
+    
+    // Step 1: Call denovo_start to execute the de novo tool
+    const startResponse = await fetch(`${SERVER_URL}/denovo_start`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -196,6 +198,87 @@ async function denovo(_, mgfFiles, params) {
         parameters: {
           mgf_files: mgfFiles,
           method: params.method,
+          use_gpu_mode: params.use_gpu_mode,
+          resource_ratio: params.resource_ratio
+        }
+      })
+    });
+    
+    const startResult = await startResponse.json();
+    console.log("De Novo start result:", startResult);
+    
+    if (!startResult.success) {
+      return startResult;
+    }
+    
+    // Step 2: Call denovo_treatment to generate final output files
+    const treatmentResponse = await fetch(`${SERVER_URL}/denovo_treatment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        parameters: {
+          method: params.method,
+          denovo_result_file: startResult.result_files || [],
+          min_global_score: params.min_global_score,
+          min_residue_score: params.min_residue_score,
+          min_peptide_length: params.min_peptide_length
+        }
+      })
+    });
+    
+    const treatmentResult = await treatmentResponse.json();
+    console.log("De Novo treatment result:", treatmentResult);
+    return treatmentResult;
+    
+  } catch (error) {
+    console.error('De Novo error:', error);
+    throw error;
+  }
+}
+
+async function denovoStart(_, mgfFiles, params) {
+  try {
+    console.log("Starting De Novo (step 1: denovo_start) with params:", params)
+    
+    const response = await fetch(`${SERVER_URL}/denovo_start`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        parameters: {
+          mgf_files: mgfFiles,
+          method: params.method
+        }
+      })
+    });
+    
+    const result = await response.json();
+    console.log("De Novo start result:", result);
+    return result;
+    
+  } catch (error) {
+    console.error('De Novo start error:', error);
+    throw error;
+  }
+}
+
+async function denovoTreatment(_, resultFiles, params) {
+  try {
+    console.log("Starting De Novo (step 2: denovo_treatment) with params:", params)
+    
+    // Treatment is ALWAYS on main server (server 1)
+    const response = await fetch(`${SERVER_URL}/denovo_treatment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        parameters: {
+          method: params.method,
+          denovo_result_file: resultFiles,
           min_global_score: params.min_global_score,
           min_residue_score: params.min_residue_score,
           min_peptide_length: params.min_peptide_length
@@ -204,17 +287,18 @@ async function denovo(_, mgfFiles, params) {
     });
     
     const result = await response.json();
-    console.log("De Novo result:", result);
+    console.log("De Novo treatment result:", result);
     return result;
     
   } catch (error) {
-    console.error('De Novo error:', error);
+    console.error('De Novo treatment error:', error);
     throw error;
   }
 }
 
 async function getDenovoStats(_, jsonPath) {
   try {
+    console.log("Fetching De Novo stats for JSON path:", jsonPath)
     const response = await fetch(`${SERVER_URL}/denovo_stats`, {
       method: 'POST',
       headers: {
@@ -300,6 +384,69 @@ async function downloadFile(_, filePath) {
   }
 }
 
+async function searchProtein(_, proteinIndexPath, query) {
+  try {
+    console.log(`Searching proteins in ${proteinIndexPath} with query: ${query}`);
+    
+    const response = await fetch(`${SERVER_URL}/brownovo_search_protein`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        protein_index_path: proteinIndexPath,
+        query: query
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Search failed: ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    return result.proteins || [];
+    
+  } catch (error) {
+    console.error('Protein search error:', error);
+    throw error;
+  }
+}
+
+async function getProteinDetails(_, proteinIndexPath, accession, filters) {
+  try {
+    console.log(`Getting protein details for ${accession}`);
+    
+    const response = await fetch(`${SERVER_URL}/brownovo_protein_details`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        protein_index_path: proteinIndexPath,
+        accession: accession,
+        filters: filters
+      })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Failed to get protein details: ${response.statusText}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      return result.protein;
+    } else {
+      console.error('Protein details error:', result.error);
+      return null;
+    }
+    
+  } catch (error) {
+    console.error('Get protein details error:', error);
+    throw error;
+  }
+}
+
 app.whenReady().then(() => {
   ipcMain.handle('browse', browse);
   ipcMain.handle('send-files', sendFiles);
@@ -307,8 +454,12 @@ app.whenReady().then(() => {
   ipcMain.handle('get-recover-stats', getRecoverStats);
   ipcMain.handle('get-denovo-stats', getDenovoStats);
   ipcMain.handle('denovo', denovo);
+  ipcMain.handle('denovo-start', denovoStart);
+  ipcMain.handle('denovo-treatment', denovoTreatment);
   ipcMain.handle('msblast', msblast);
   ipcMain.handle('download-file', downloadFile);
+  ipcMain.handle('search-protein', searchProtein);
+  ipcMain.handle('get-protein-details', getProteinDetails);
   ipcMain.handle('get-file-stats', getFileStats);
   ipcMain.handle('get-job-timeouts', getJobTimeouts);
   

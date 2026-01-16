@@ -54,16 +54,24 @@
                 
                 <label><input type="radio" name="denovo-method" value="novor"> Novor</label>
                 <label><input type="radio" name="denovo-method" value="powernovo" checked> Powernovo</label>
-                
+
+                <p class="filter-explanation">
+                  After de novo prediction, each peptide has a global score and a residue score for every position.
+                  The filters below control which peptides are kept and which subsequences are sent to MS-BLAST:
+                </p>
+
                 <label for="min-global-score">Minimum global score:</label>
                 <input type="number" id="min-global-score" value="25" min="0" step="1">
+                <small class="filter-hint">Only peptides with a global score above this threshold are retained.</small>                
                 
                 <label for="min-residue-score">Minimum residue score:</label>
                 <input type="number" id="min-residue-score" value="50" min="0" step="1">
-                
+                <small class="filter-hint">Within each retained peptide, the tool searches for the longest subsequences where residues meet this score, allowing at most one residue below the threshold. It can yield multiple high-confidence subsequences per peptides, they are all used for MS-BLAST searches.</small>
+
                 <label for="min-peptide-length">Minimum peptide length:</label>
                 <input type="number" id="min-peptide-length" value="6" min="1" step="1">
-                
+                <small class="filter-hint">Only subsequences with a length greater than or equal to this value are kept.</small>
+ 
                 <button id="denovo-btn">De novo prediction</button>
               </div>
               

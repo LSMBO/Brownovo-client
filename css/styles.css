@@ -196,7 +196,7 @@ input[type="number"],
 select {
   width: 100%;
   padding: 10px;
-  margin: 5px 0 15px 0;
+  margin: 5px 0 5px 0;
   border: 1px solid #a5d6a7;
   border-radius: 6px;
   font-size: 1em;
@@ -223,11 +223,40 @@ input[type="radio"] {
   cursor: pointer;
 }
 
+input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+  width: auto;
+}
+
 label:has(input[type="radio"]) {
   display: inline-block;
   margin-right: 20px;
   cursor: pointer;
   font-weight: 400;
+}
+
+label:has(input[type="checkbox"]) {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+#gpu-options {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f1f8e9;
+  border-left: 3px solid #7cb342;
+  border-radius: 6px;
+}
+
+#resource-ratio-container {
+  margin-top: 10px;
+  padding: 10px;
+  background: #fff;
+  border-radius: 4px;
 }
 
 button {
@@ -496,6 +525,51 @@ select[multiple] {
 }
 
 /* MS-Blast result styling */
+.msblast-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+
+.sample-selector {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sample-selector label {
+  font-weight: 600;
+  color: #2e7d32;
+  white-space: nowrap;
+  line-height: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.sample-select {
+  flex: 1;
+  padding: 10px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.95em;
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+  height: 42px;
+  margin: 0;
+}
+
+.sample-select:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
 .msblast-result-content {
   display: flex;
   justify-content: space-between;
@@ -514,6 +588,38 @@ select[multiple] {
   color: #666;
 }
 
+/* Loading Overlay */
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  gap: 15px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid #e0e0e0;
+  border-top: 5px solid #4caf50;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loading-overlay p {
+  color: #555;
+  font-size: 1em;
+  margin: 0;
+}
+
 .download-btn {
   background: #4caf50;
   color: white;
@@ -529,6 +635,8 @@ select[multiple] {
   transition: all 0.3s;
   width: auto;
   margin: 0;
+  height: 42px;
+  box-sizing: border-box;
 }
 
 .download-btn:hover:not(:disabled) {
@@ -546,4 +654,596 @@ select[multiple] {
 .download-icon {
   font-size: 1.2em;
   font-weight: bold;
+}
+
+/* Protein Search Section */
+.protein-search-section {
+  margin-top: 20px;
+  padding-top: 0;
+}
+
+.protein-search-section h4 {
+  color: #2e7d32;
+  font-size: 1.1em;
+  margin: 0 0 15px 0;
+  font-weight: 600;
+}
+
+.protein-search-section h5 {
+  color: #388e3c;
+  font-size: 0.95em;
+  margin: 15px 0 10px 0;
+  font-weight: 600;
+}
+
+.search-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.search-input-group {
+  position: relative;
+}
+
+.protein-search-input {
+  width: 100%;
+  padding: 10px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 0.95em;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
+}
+
+.protein-search-input:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.search-suggestions {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  max-height: 200px;
+  overflow-y: auto;
+  background: white;
+  border: 2px solid #4caf50;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+}
+
+.suggestion-item {
+  padding: 10px 15px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: background-color 0.2s;
+}
+
+.suggestion-item:hover {
+  background-color: #e8f5e9;
+}
+
+.suggestion-item.no-results {
+  color: #999;
+  cursor: default;
+}
+
+.suggestion-item.no-results:hover {
+  background-color: transparent;
+}
+
+.suggestion-desc {
+  font-size: 0.85em;
+  color: #666;
+}
+
+.filter-group {
+  background: #f9f9f9;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  margin-bottom: 15px;
+}
+
+.expandable-filter {
+  background: #f9f9f9;
+  padding: 0;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+}
+
+.filter-header {
+  padding: 15px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background-color 0.2s;
+  user-select: none;
+}
+
+.filter-header:hover {
+  background-color: #e8f5e9;
+}
+
+.filter-header h5 {
+  margin: 0;
+  color: #2e7d32;
+  font-size: 0.95em;
+  font-weight: 600;
+}
+
+.expand-icon {
+  font-size: 0.9em;
+  color: #2e7d32;
+  transition: transform 0.3s;
+}
+
+.expand-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.filter-content {
+  padding: 15px;
+  border-top: 1px solid #e0e0e0;
+}
+
+.filter-explanation {
+  font-size: 0.85em;
+  color: #555;
+  line-height: 1.6;
+  margin: 0 0 15px 0;
+  padding: 10px;
+  background: #fff;
+  border-left: 3px solid #4caf50;
+  border-radius: 4px;
+}
+
+.filter-explanation-list {
+  margin: 10px 0 10px 20px;
+  padding: 0;
+  list-style: disc;
+}
+
+.filter-explanation-list li {
+  font-size: 0.85em;
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 8px;
+}
+
+.filter-hint {
+  display: block;
+  font-size: 0.8em;
+  color: #777;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.filters-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-item label {
+  font-size: 0.85em;
+  color: #555;
+  font-weight: 500;
+}
+
+.filter-input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.9em;
+  width: 100%;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: #4caf50;
+}
+
+.search-protein-btn {
+  background: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 20px;
+  font-size: 0.95em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.search-protein-btn:hover:not(:disabled) {
+  background: #388e3c;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.search-protein-btn:disabled {
+  background: #9e9e9e;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Protein Display */
+.protein-display {
+  margin-top: 20px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 6px;
+  border: 2px solid #4caf50;
+}
+
+.protein-header {
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.protein-accession {
+  color: #1b5e20;
+  font-size: 1.2em;
+  margin: 0 0 5px 0;
+  font-weight: 600;
+}
+
+.protein-description {
+  color: #555;
+  margin: 0 0 10px 0;
+  font-size: 0.9em;
+  font-style: italic;
+}
+
+.protein-info {
+  display: flex;
+  gap: 20px;
+  font-size: 0.9em;
+}
+
+.protein-info span {
+  color: #666;
+}
+
+.protein-info strong {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+/* Peptide Legend */
+.peptide-legend {
+  margin-bottom: 20px;
+}
+
+.peptide-legend h5 {
+  color: #2e7d32;
+  font-size: 1em;
+  margin: 0 0 10px 0;
+  font-weight: 600;
+}
+
+.peptide-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+  padding: 10px;
+  background: white;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.peptide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.peptide-item:hover {
+  background: #e8f5e9;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.peptide-item.expanded {
+  background: #e8f5e9;
+}
+
+.peptide-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.peptide-info strong {
+  color: #1b5e20;
+  font-size: 0.9em;
+}
+
+.peptide-score {
+  font-size: 0.85em;
+  color: #666;
+}
+
+.peptide-details {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+  font-size: 0.85em;
+}
+
+.peptide-details p {
+  margin: 5px 0;
+  color: #555;
+}
+
+.peptide-details strong {
+  color: #2e7d32;
+}
+
+/* Sequence Viewer */
+.sequence-viewer {
+  background: white;
+  padding: 15px;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+  overflow-x: auto;
+}
+
+.sequence-container {
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+.sequence-line-wrapper {
+  position: relative;
+  margin-bottom: 10px;
+}
+
+.sequence-line {
+  display: flex;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.line-number {
+  color: #999;
+  margin-right: 10px;
+  user-select: none;
+  font-size: 12px;
+}
+
+.residue {
+  display: inline-block;
+  width: 12px;
+  text-align: center;
+  padding: 2px 0;
+  cursor: default;
+  font-size: 13px;
+}
+
+/* Peptide bars container */
+.peptide-bars-container {
+  position: relative;
+  width: 100%;
+  margin-top: 2px;
+  margin-bottom: 5px;
+}
+
+.peptide-bar-wrapper {
+  position: relative;
+}
+
+.peptide-bar {
+  position: absolute;
+  height: 6px;
+  background-color: #4caf50;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.peptide-bar:hover {
+  background-color: #388e3c;
+  height: 8px;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+}
+
+.peptide-bar.active {
+  background-color: #2e7d32;
+  height: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Peptide sequence legend */
+.peptide-sequence-legend {
+  background: #f5f5f5;
+  padding: 10px 15px;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  border: 1px solid #e0e0e0;
+}
+
+.peptide-sequence-legend h6 {
+  margin: 0 0 8px 0;
+  color: #2e7d32;
+  font-size: 0.9em;
+  font-weight: 600;
+}
+
+.legend-items {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.85em;
+  color: #555;
+}
+
+.legend-color {
+  display: inline-block;
+  width: 20px;
+  height: 12px;
+  border-radius: 3px;
+  border: 1px solid #ccc;
+}
+.peptide-sequence-detail {
+  position: absolute;
+  top: 100%;
+  margin-top: 5px;
+  background: white;
+  border: 2px solid #4caf50;
+  border-radius: 6px;
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+  min-width: 300px;
+  max-width: 600px;
+}
+
+.peptide-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.peptide-detail-header strong {
+  color: #2e7d32;
+  font-size: 1em;
+}
+
+.close-btn {
+  cursor: pointer;
+  font-size: 1.5em;
+  color: #666;
+  line-height: 1;
+  padding: 0 5px;
+  transition: color 0.2s;
+}
+
+.close-btn:hover {
+  color: #d32f2f;
+}
+
+.peptide-detail-info {
+  font-size: 0.85em;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.peptide-color-legend {
+  margin-top: 15px;
+  padding-top: 10px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.peptide-color-legend .legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8em;
+  color: #555;
+}
+
+.peptide-color-legend .legend-color {
+  display: inline-block;
+  width: 16px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid #ccc;
+  flex-shrink: 0;
+}
+
+.peptide-sequence-table {
+  font-family: 'Courier New', monospace;
+  display: inline-block;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.sequence-residues-row,
+.sequence-scores-row {
+  display: flex;
+  line-height: 1;
+}
+
+.seq-char,
+.score-cell {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 22px;
+  font-size: 11px;
+  border-right: 1px solid #f0f0f0;
+}
+
+.seq-char {
+  font-weight: 600;
+  border-bottom: 1px solid #ddd;
+}
+
+.score-cell {
+  font-size: 9px;
+  color: #666;
+  background-color: #fafafa;
+}
+
+.seq-full {
+  background-color: #ab47bc;
+  color: white;
+}
+
+.seq-filtered {
+  background-color: #42a5f5;
+  color: white;
+}
+
+.seq-matched {
+  background-color: #4caf50;
+  color: white;
+}
+
+.seq-mismatch {
+  background-color: #2e7d32;
+  color: white;
 }

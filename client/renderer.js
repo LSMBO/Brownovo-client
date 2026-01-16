@@ -29,7 +29,65 @@ function initTabs() {
 }
 
 // Initialize tabs on load
-document.addEventListener('DOMContentLoaded', initTabs);
+document.addEventListener('DOMContentLoaded', () => {
+  initTabs();
+  initDenovoGpuOptions();
+  initDenovoFilterExpander();
+});
+
+// Initialize De Novo filter expander
+function initDenovoFilterExpander() {
+  const filterHeader = document.getElementById('denovo-filter-header');
+  const filterContent = document.getElementById('denovo-filter-content');
+  const expandIcon = filterHeader.querySelector('.expand-icon');
+  
+  if (filterHeader && filterContent && expandIcon) {
+    filterHeader.addEventListener('click', () => {
+      const isExpanded = filterContent.style.display !== 'none';
+      filterContent.style.display = isExpanded ? 'none' : 'block';
+      expandIcon.classList.toggle('expanded', !isExpanded);
+    });
+  }
+}
+
+// Initialize De Novo GPU options visibility
+function initDenovoGpuOptions() {
+  const denovoMethodRadios = document.querySelectorAll('input[name="denovo-method"]');
+  const gpuOptions = document.getElementById('gpu-options');
+  const useGpuCheckbox = document.getElementById('use-gpu-mode');
+  const resourceRatioContainer = document.getElementById('resource-ratio-container');
+  
+  // Function to toggle GPU options visibility based on selected method
+  function toggleGpuOptions() {
+    const selectedMethod = document.querySelector('input[name="denovo-method"]:checked').value;
+    if (selectedMethod === 'powernovo') {
+      gpuOptions.style.display = 'block';
+    } else {
+      gpuOptions.style.display = 'none';
+      useGpuCheckbox.checked = false;
+      resourceRatioContainer.style.display = 'none';
+    }
+  }
+  
+  // Function to toggle resource ratio container based on GPU checkbox
+  function toggleResourceRatio() {
+    if (useGpuCheckbox.checked) {
+      resourceRatioContainer.style.display = 'block';
+    } else {
+      resourceRatioContainer.style.display = 'none';
+    }
+  }
+  
+  // Add event listeners
+  denovoMethodRadios.forEach(radio => {
+    radio.addEventListener('change', toggleGpuOptions);
+  });
+  
+  useGpuCheckbox.addEventListener('change', toggleResourceRatio);
+  
+  // Initial state
+  toggleGpuOptions();
+}
 
 // Selects
 const mgfSelect = document.getElementById('mgf-select');
@@ -73,7 +131,7 @@ async function updateFastaList() {
   // Filter de novo files
   denovoFastaFiles = fastaFiles.filter(file => {
     const name = file.name.toLowerCase();
-    return name.endsWith('novor.fasta') || name.endsWith('powernovo.fasta');
+    return name.endsWith('denovo.fasta') || name.endsWith('novor.fasta') || name.endsWith('powernovo.fasta');
   });
   
   updateFastaSelects();
@@ -246,8 +304,9 @@ document.getElementById('denovo-btn').addEventListener('click', async () => {
   // Add generated FASTA files to fastaFiles
   if (outputFiles && outputFiles.length > 0) {
     outputFiles.forEach(fileInfo => {
-      const filePath = typeof fileInfo === 'string' ? fileInfo : fileInfo.path;
-      const fileSize = typeof fileInfo === 'object' ? fileInfo.size : undefined;
+      // Handle new format: {fasta: path, fasta_size: size, json: path, json_size: size}
+      const filePath = fileInfo.fasta || fileInfo.path;
+      const fileSize = fileInfo.fasta_size || fileInfo.size;
       
       const fileName = filePath.split('/').pop();
       fastaFiles.push({

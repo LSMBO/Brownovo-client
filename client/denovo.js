@@ -19,7 +19,7 @@ async function handleDenovo(mgfFiles, denovoMgfSelect) {
     const localFiles = selectedFiles.filter(f => !f.isServerFile);
     const serverFiles = selectedFiles.filter(f => f.isServerFile).map(f => f.path);
 
-    // Upload local files if necessary
+    // Upload local files to server
     if (localFiles.length > 0) {
       addJob(`${jobId}_upload`, 'upload', `Uploading ${localFiles.length} file(s)`);
       
@@ -27,7 +27,7 @@ async function handleDenovo(mgfFiles, denovoMgfSelect) {
       
       const uploadResults = await window.electronAPI.sendFiles(
         filePaths,
-        'brownovo/data',
+        'brownovo/data'
       );
       
       const failed = uploadResults.filter(r => !r.success);
@@ -45,31 +45,67 @@ async function handleDenovo(mgfFiles, denovoMgfSelect) {
       serverFiles.push(...uploadedPaths);
     }
     
-    // Start De Novo processing
-    addJob(jobId, 'denovo', `De Novo (${denovoMethod}) on ${serverFiles.length} file(s)`);
+    // Step 1: De Novo Start
+    // Capitalize method name for display
+    const methodDisplayName = denovoMethod.charAt(0).toUpperCase() + denovoMethod.slice(1);
     
-    const denovoResult = await window.electronAPI.denovo(serverFiles, {
+    addJob(`${jobId}_start`, 'denovo', methodDisplayName);
+    
+    const startResult = await window.electronAPI.denovoStart(serverFiles, {
+      method: denovoMethod
+    });
+    
+    if (!startResult.success) {
+      updateJob(`${jobId}_start`, 'failed', methodDisplayName);
+      setTimeout(() => removeJob(`${jobId}_start`), timeouts.denovo);
+      alert('Error during De Novo start processing');
+      return null;
+    }
+    
+    updateJob(`${jobId}_start`, 'completed', methodDisplayName);
+    
+    // Step 2: De Novo Treatment
+    addJob(`${jobId}_treatment`, 'denovo', `${methodDisplayName} results treatment`);
+    
+    const treatmentResult = await window.electronAPI.denovoTreatment(startResult.output_files, {
       method: denovoMethod,
       min_global_score: minGlobalScore,
       min_residue_score: minResidueScore,
       min_peptide_length: minPeptideLength
     });
     
-    if (denovoResult.success) {
-      updateJob(jobId, 'completed', `${denovoResult.output_files.length} file(s) generated`);
-      setTimeout(() => removeJob(jobId), timeouts.denovo);
+    console.log('Treatment result:', treatmentResult);
+    
+    if (treatmentResult.success) {
+      updateJob(`${jobId}_treatment`, 'completed', `${methodDisplayName} results treatment`);
+      // Keep both jobs visible after completion
+      setTimeout(() => {
+        removeJob(`${jobId}_start`);
+        removeJob(`${jobId}_treatment`);
+      }, timeouts.denovo);
       
-      // Display results in visualization section
-      displayDenovoResults(denovoResult.output_files);
+      // Transform output_files format to match what displayDenovoResults expects
+      const formattedFiles = treatmentResult.output_files.map(file => ({
+        path: file.fasta,
+        size: file.fasta_size
+      }));
       
-      alert(`De Novo completed!\nGenerated files: ${denovoResult.output_files.length}`);
-      console.log('Output files:', denovoResult.output_files);
+      console.log('Formatted files for display:', formattedFiles);
       
-      return denovoResult.output_files;
+      // Display results in visualization section (wait for completion)
+      await displayDenovoResults(formattedFiles);
+      
+      alert(`De Novo completed!\nGenerated files: ${treatmentResult.output_files.length}`);
+      console.log('Output files:', treatmentResult.output_files);
+      
+      return treatmentResult.output_files;
     } else {
-      updateJob(jobId, 'failed', 'De Novo failed');
-      setTimeout(() => removeJob(jobId), timeouts.denovo);
-      alert('Error during De Novo processing');
+      updateJob(`${jobId}_treatment`, 'failed', `${methodDisplayName} results treatment`);
+      setTimeout(() => {
+        removeJob(`${jobId}_start`);
+        removeJob(`${jobId}_treatment`);
+      }, timeouts.denovo);
+      alert('Error during De Novo treatment');
       return null;
     }
     
@@ -82,14 +118,19 @@ async function handleDenovo(mgfFiles, denovoMgfSelect) {
   }
 }
 
-function displayDenovoResults(outputFiles) {
+async function displayDenovoResults(outputFiles) {
   const visualizationSection = document.getElementById('denovo-visualization');
   const resultsContainer = document.getElementById('denovo-results');
   const template = document.getElementById('denovo-result-template');
   
+  console.log('displayDenovoResults called with:', outputFiles);
+  
   resultsContainer.innerHTML = '';
   
-  outputFiles.forEach(async (fileInfo) => {
+  // Use for...of instead of forEach to properly handle async/await
+  for (const fileInfo of outputFiles) {
+    console.log('Processing file:', fileInfo);
+    
     // Clone the template
     const card = template.content.cloneNode(true);
     
@@ -105,8 +146,12 @@ function displayDenovoResults(outputFiles) {
     card.querySelector('[data-field="fileBaseName"]').textContent = fileBaseName;
     
     try {
+      console.log('Fetching stats for:', jsonPath);
+      
       // Fetch statistics from server
       const statsResult = await window.electronAPI.getDenovoStats(jsonPath);
+      
+      console.log('Stats result:', statsResult);
       
       if (statsResult.success && statsResult.statistics) {
         const stats = statsResult.statistics;
@@ -132,9 +177,10 @@ function displayDenovoResults(outputFiles) {
     }
     
     resultsContainer.appendChild(card);
-  });
+  }
   
   visualizationSection.style.display = 'block';
+  console.log('displayDenovoResults completed');
 }
 
 // Export for use in renderer.js
