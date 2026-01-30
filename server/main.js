@@ -91,23 +91,22 @@ async function sendFiles(_, filePaths, destinationPath) {
       const stats = fs.statSync(filePath);
       const fileName = path.basename(filePath);
       const fileSize = stats.size;
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
       
       // Build full destination path
       const fullDestPath = `${destinationPath}/${fileName}`;
       
       console.log(`Sending ${fileName} (${fileSize} bytes) to ${fullDestPath} on ${SERVER_URL}...`);
       
+      // Use FormData with streaming for large files
+      const form = new FormData();
+      form.append('file', fs.createReadStream(filePath));
+      form.append('file_path', fullDestPath);
+      form.append('size', fileSize.toString());
+      
       const response = await fetch(`${SERVER_URL}/upload`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          content: fileContent,
-          file_path: fullDestPath,
-          size: fileSize
-        })
+        body: form,
+        headers: form.getHeaders()
       });
       
       const result = await response.json();
